@@ -1,0 +1,50 @@
+model OptiConsult
+  uses "mmxprs"
+
+  declarations
+    ConsultantNames: set of string
+    TotalConsultants: array(ConsultantNames) of real
+    DailySalary: array(ConsultantNames) of real
+    BenchLimits: array(ConsultantNames) of real
+    
+    HomeLocationNames: set of string
+    ProjectLocationNames: set of string
+    
+    TravelCosts: array(ProjectLocationNames, ProjectLocationNames) of real
+    
+    TotalTravelBudget: integer
+    WorkingDays: integer
+    
+    ProjectIDs = 1..13
+    ProjectLocations: array(ProjectIDs) of real
+    
+    ConsultantsByHomeLocationAndLevel: array(ProjectLocationNames, ConsultantNames) of real
+    
+    Demand: array(ProjectIDs, ConsultantNames) of real
+    DailyRate: array(ProjectIDs, ConsultantNames) of real
+    
+    ScotlandAllocation: array(ProjectIDs, ConsultantNames) of mpvar
+    LondonAllocation: array(ProjectIDs, ConsultantNames) of mpvar
+    NorthEnglandAllocation: array(ProjectIDs, ConsultantNames) of mpvar
+    
+    Projects: array(ProjectIDs) of mpvar
+
+  end-declarations
+
+initialisations from "OptiConsult.dat"
+  ConsultantNames TotalConsultants DailySalary BenchLimits 
+  
+  HomeLocationNames ProjectLocationNames TravelCosts 
+  TotalTravelBudget WorkingDays
+  
+  ProjectLocations ConsultantsByHomeLocationAndLevel
+  
+  Demand DailyRate
+end-initialisations
+
+forall(p in ProjectIDs) do
+  SeniorConsultingManagerCS(p) := ScotlandAllocation(p, "Senior Consulting Manager") + LondonAllocation(p, "Senior Consulting Manager") + NorthEnglandAllocation(p, "Senior Consulting Manager") = Projects(p)*Demand(P, "Senior Consulting Manager")
+end-do
+
+
+end-model
